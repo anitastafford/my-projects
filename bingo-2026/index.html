@@ -6,7 +6,7 @@
   <title>Bingo 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&family=Caveat:wght@400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&family=Quicksand:wght@400..700&family=Momo+Signature&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -29,6 +29,7 @@
     h1 {
       text-align: center;
       color: #001171;
+      font-family: "Momo Signature", cursive;
       font-size: clamp(2.5rem, 6vw, 4.5rem);
       letter-spacing: -2px;
       margin: 0 0 20px;
@@ -37,7 +38,10 @@
       max-width: 900px;
       margin: 0 auto 40px;
       text-align: center;
+      font-family: "Quicksand", sans-serif;
       font-size: 1.15rem;
+      font-weight: 400;
+      line-height: 1.2;
       color: #333;
     }
     .daubers {
@@ -172,8 +176,8 @@
     }
     .dauber-name {
       order: -1;
-      font-family: "Caveat", cursive;
-      font-size: 1.6rem;
+      font-family: "Momo Signature", cursive;
+      font-size: 1.2rem;
       font-weight: 400;
       line-height: 28px;
       height: 28px;
@@ -189,8 +193,9 @@
       gap: 0;
       max-width: 1400px;
       margin: 0 auto;
-      border: 4px solid #d3d3d3;
-      border-radius: 10px;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
       overflow: hidden;
       container-type: inline-size;
       container-name: board;
@@ -248,8 +253,47 @@
     .card p {
       margin: clamp(2px, 1.5cqw, 8px) 0 2px;
       text-align: center;
-      font-size: clamp(0.42rem, 6cqw, 0.85rem);
+      font-size: clamp(0.8rem, 10.5cqw, 1.5rem);
       line-height: 1.2;
+    }
+    .rules {
+      max-width: 900px;
+      margin: 48px auto 0;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      padding: 32px clamp(20px, 5vw, 40px);
+    }
+    .rules h2 {
+      color: #001171;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      letter-spacing: -1px;
+      margin: 0 0 24px;
+    }
+    .rules-block {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .rules-block + .rules-block {
+      margin-top: 24px;
+    }
+    .rules-icon {
+      font-size: 1.4rem;
+      line-height: 1.4;
+      flex-shrink: 0;
+    }
+    .rules-block h3 {
+      margin: 0 0 4px;
+      font-size: 1.05rem;
+    }
+    .rules-block ul {
+      margin: 0;
+      padding-left: 20px;
+      line-height: 1.5;
+    }
+    .rules-block li + li {
+      margin-top: 4px;
     }
     @media (max-width: 700px) {
       body {
@@ -581,7 +625,44 @@
         <p>Celebrate bunnies or eggs</p>
       </div>
   </div>
-  <button type="button" id="editorToggleLink" class="editor-toggle-btn" title="Enable editing" aria-label="Enable editing">✏️</button>
+  <div class="rules">
+    <h2>How to play along</h2>
+    <div class="rules-block">
+      <span class="rules-icon">👍</span>
+      <div>
+        <h3>Instructions:</h3>
+        <ul>
+          <li>You'll receive an invite to the 2026 Bingo group on the Signal messaging app (free to download).</li>
+          <li>When you complete a square, share a photo related to your completed task in the group chat.</li>
+          <li>Anita will daub the squares on this board to keep track of everyone's progress.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="rules-block">
+      <span class="rules-icon">⭐</span>
+      <div>
+        <h3>Achievements</h3>
+        <ul>
+          <li>Complete <strong>one row</strong> for kudos and awesomeness.</li>
+          <li>Complete both the <strong>diagonals (X)</strong> to show you're serious. (There <em>may</em> be prizes for all who completes this)</li>
+          <li><strong>Blackout!!</strong> A prize and the coveted title of <strong>BINGO 2026 champion</strong> for the person who finishes first!</li>
+        </ul>
+      </div>
+    </div>
+    <div class="rules-block">
+      <span class="rules-icon">❓</span>
+      <div>
+        <h3>Rules:</h3>
+        <ul>
+          <li>You cannot complete more than one square per day</li>
+          <li>No double daubing. One experience cannot complete more than one square</li>
+          <li>Though prizes are meant to motivate, the ideal is that participants will focus on the spirit of the activity instead of mere completion or competition. Be true to the intent of the square!</li>
+          <li>It's a-okay to get creative with your photos. If it's really not possible to take a photo related to your task, just send a message in the group chat.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <button type="button" id="editorToggleLink" class="editor-toggle-btn" title="Enable editing" aria-label="Enable editing">🔒</button>
   <script>
   (function () {
     var STORAGE_KEY = 'bingo2026-daubs';
