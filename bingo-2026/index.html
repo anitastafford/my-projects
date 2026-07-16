@@ -580,7 +580,7 @@
       </div>
   </div>
   <button type="button" id="editorToggleLink" class="editor-toggle-btn" title="Enable editing" aria-label="Enable editing">✏️</button>
-  <button type="button" id="exportStateBtn" class="editor-toggle-btn" title="Copy code to commit" aria-label="Copy code to commit" hidden>📋</button>
+  <button type="button" id="exportStateBtn" class="editor-toggle-btn" title="Download updated page" aria-label="Download updated page" hidden>💾</button>
   <script>
   (function () {
     var STORAGE_KEY = 'bingo2026-daubs';
@@ -588,8 +588,8 @@
     var EDITOR_PIN = 'bingo2026';
     var DAUBER_ORDER = ['maya', 'anita', 'shawn', 'marie', 'max', 'mila'];
     // Baked-in daub state, committed to the repo so everyone sees the same board.
-    // After daubing, click "Copy code to commit" and paste the result here.
-    var DEFAULT_STATE = {};
+    // After daubing, click the save (💾) button, then send the downloaded index.html to Claude to commit.
+    var DEFAULT_STATE = {"0":["mila","marie"],"1":["marie","maya","anita","mila"],"2":["mila","marie","maya"],"3":["marie","maya","anita"],"4":["marie","maya","anita","shawn","mila","max"],"5":["shawn","marie","maya"],"6":["marie","maya","mila"],"7":["mila","marie","shawn"],"8":["marie","maya","mila"],"9":["marie","maya","mila"],"10":["marie","maya","anita"],"11":["maya","anita","mila","max"],"12":["marie","anita","shawn"],"14":["mila","marie","maya","anita"],"15":["marie","maya","anita","shawn","max"],"16":["maya","anita","mila"],"17":["marie","maya","anita"],"18":["marie","maya","mila"],"19":["marie","maya","mila"],"21":["mila","maya","max"],"22":["marie","anita"],"23":["marie","maya","anita"],"25":["marie"],"26":["marie","anita","shawn"],"27":["marie"],"28":["marie","anita","mila"],"29":["marie","maya","mila"],"30":["anita","shawn"],"32":["marie","maya","anita","shawn","mila"],"33":["marie"],"34":["marie","maya","anita","shawn","mila"],"35":["marie","maya","anita","shawn","mila"],"37":["marie","maya","anita"],"38":["marie","anita"],"39":["marie","maya","anita"],"40":["marie","maya","anita","mila"],"41":["marie","maya","mila"],"42":["marie","maya","anita"],"44":["marie","maya","anita","shawn","mila","max"],"45":["marie","anita","shawn","mila"],"46":["marie","maya","mila"],"47":["max"],"48":["marie","maya","anita","shawn","max"]};
 
     var isEditor = localStorage.getItem(EDITOR_KEY) === 'true';
     var selected = null;
@@ -676,16 +676,27 @@
     }
 
     exportBtn.addEventListener('click', function () {
-      var code = 'var DEFAULT_STATE = ' + JSON.stringify(state) + ';';
       var done = function () {
         exportBtn.textContent = '✅';
-        setTimeout(function () { exportBtn.textContent = '📋'; }, 1200);
+        setTimeout(function () { exportBtn.textContent = '💾'; }, 1200);
       };
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(code).then(done, function () { prompt('Copy this code:', code); });
-      } else {
-        prompt('Copy this code:', code);
-      }
+      var fail = function () {
+        alert('Could not prepare the download. Try again, or ask Claude for help.');
+      };
+      fetch(location.href).then(function (res) { return res.text(); }).then(function (html) {
+        var newLine = 'var DEFAULT_STATE = ' + JSON.stringify(state) + ';';
+        var updated = html.replace(/var DEFAULT_STATE = \{[^;]*\};/, newLine);
+        var blob = new Blob([updated], { type: 'text/html' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'index.html';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        done();
+      }).catch(fail);
     });
 
     cards.forEach(function (card, index) {
