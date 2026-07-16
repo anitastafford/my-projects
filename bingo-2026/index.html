@@ -6,7 +6,7 @@
   <title>Bingo 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&family=Quicksand:wght@400..700&family=Momo+Signature&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&family=Quicksand:wght@400..700&family=Momo+Signature&family=Bowlby+One+SC&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -23,14 +23,21 @@
       color: #666;
       text-decoration: none;
       font-size: 0.9rem;
+      text-align: center;
       max-width: 1200px;
-      margin: 0 auto 20px;
+      margin: 0 auto;
+    }
+    .footer-divider {
+      max-width: 1200px;
+      margin: 40px auto 20px;
+      border: none;
+      border-top: 1px solid #e5e5e5;
     }
     h1 {
       text-align: center;
       color: #001171;
-      font-family: "Momo Signature", cursive;
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-family: "Bowlby One SC", cursive;
+      font-size: clamp(3rem, 8vw, 5.5rem);
       letter-spacing: -2px;
       margin: 0 0 20px;
     }
@@ -181,7 +188,7 @@
       font-weight: 400;
       line-height: 28px;
       height: 28px;
-      color: #001171;
+      color: #000000;
       visibility: hidden;
     }
     .dauber.selected .dauber-name {
@@ -266,6 +273,7 @@
     }
     .rules h2 {
       color: #001171;
+      font-family: "Bowlby One SC", cursive;
       font-size: clamp(1.8rem, 4vw, 2.8rem);
       letter-spacing: -1px;
       margin: 0 0 24px;
@@ -315,8 +323,7 @@
       <p class="pin-modal-error" id="pinError" hidden>Not quite — try again.</p>
     </div>
   </div>
-  <a class="back" href="../">&larr; Back to all projects</a>
-  <h1>Bingo 2026!</h1>
+  <h1>BINGO 2026!</h1>
   <p class="intro">The goal of 2026 Bingo is to encourage us to live more broadly and share the year's experiences. Some squares are very specific and others are intentionally vague to let people make them their own.</p>
   <div class="daubers">
     <p class="daubers-label" id="daubersLabel">Pick your photo, then tap a square to daub it</p>
@@ -632,8 +639,7 @@
       <div>
         <h3>Instructions:</h3>
         <ul>
-          <li>You'll receive an invite to the 2026 Bingo group on the Signal messaging app (free to download).</li>
-          <li>When you complete a square, share a photo related to your completed task in the group chat.</li>
+          <li>When you complete a square, share a photo related to your completed task in the Signal group chat.</li>
           <li>Anita will daub the squares on this board to keep track of everyone's progress.</li>
         </ul>
       </div>
@@ -663,6 +669,8 @@
     </div>
   </div>
   <button type="button" id="editorToggleLink" class="editor-toggle-btn" title="Enable editing" aria-label="Enable editing">🔒</button>
+  <hr class="footer-divider">
+  <a class="back" href="../">&larr; Back to all projects</a>
   <script>
   (function () {
     var STORAGE_KEY = 'bingo2026-daubs';
@@ -750,7 +758,7 @@
       editorLink.classList.toggle('active', isEditor);
       daubersLabel.textContent = isEditor
         ? 'Pick your photo, then tap a square to daub it'
-        : 'Tap your photo to see what you’ve completed';
+        : 'Tap your photo to see what you’ve completed and what’s left';
     }
 
     cards.forEach(function (card, index) {
