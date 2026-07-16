@@ -61,85 +61,6 @@
       font-size: 1rem;
       color: #555;
     }
-    .editor-toggle-btn {
-      display: block;
-      margin: 24px auto 0;
-      background: none;
-      border: none;
-      font-size: 1.6rem;
-      line-height: 1;
-      padding: 8px;
-      cursor: pointer;
-      opacity: 0.45;
-      transition: opacity 0.15s ease;
-    }
-    .editor-toggle-btn:hover {
-      opacity: 0.75;
-    }
-    .editor-toggle-btn.active {
-      opacity: 1;
-    }
-    .pin-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-      padding: 20px;
-    }
-    .pin-modal[hidden] {
-      display: none;
-    }
-    .pin-modal-box {
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 28px;
-      max-width: 320px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-    .pin-modal-box p {
-      margin: 0 0 12px;
-      color: #333;
-    }
-    .pin-modal-box input {
-      width: 100%;
-      padding: 10px 12px;
-      font-size: 1rem;
-      font-family: inherit;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      margin-bottom: 14px;
-    }
-    .pin-modal-actions {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
-    .pin-modal-actions button {
-      font-family: inherit;
-      font-size: 0.95rem;
-      padding: 8px 18px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-    }
-    #pinCancel {
-      background: #eee;
-      color: #333;
-    }
-    #pinSubmit {
-      background: #001171;
-      color: #fff;
-    }
-    .pin-modal-error {
-      color: #c0392b;
-      font-size: 0.85rem;
-      margin-top: 10px;
-    }
     .dauber-list {
       display: flex;
       justify-content: center;
@@ -218,9 +139,6 @@
     }
     .card.highlight {
       background: #eef2ff;
-    }
-    body.daub-active .card {
-      cursor: pointer;
     }
     .card.dimmed .card-photo > img {
       filter: grayscale(1) opacity(0.4);
@@ -312,21 +230,10 @@
   </style>
 </head>
 <body>
-  <div class="pin-modal" id="pinModal" hidden>
-    <div class="pin-modal-box">
-      <p>Enter the editing passphrase</p>
-      <input type="password" id="pinInput" autocomplete="off">
-      <div class="pin-modal-actions">
-        <button type="button" id="pinCancel">Cancel</button>
-        <button type="button" id="pinSubmit">Unlock</button>
-      </div>
-      <p class="pin-modal-error" id="pinError" hidden>Not quite — try again.</p>
-    </div>
-  </div>
   <h1>BINGO 2026!</h1>
   <p class="intro">The goal of 2026 Bingo is to encourage us to live more broadly and share the year's experiences. Some squares are very specific and others are intentionally vague to let people make them their own.</p>
   <div class="daubers">
-    <p class="daubers-label" id="daubersLabel">Pick your photo, then tap a square to daub it</p>
+    <p class="daubers-label" id="daubersLabel">Tap your photo to see what you've completed and what's left</p>
     <div class="dauber-list">
       <button class="dauber" data-id="maya"><img src="images/participants.png" alt="Maya"><span class="dauber-count"></span><span class="dauber-name">Maya</span></button>
       <button class="dauber" data-id="anita"><img src="images/participants-1.png" alt="Anita"><span class="dauber-count"></span><span class="dauber-name">Anita</span></button>
@@ -640,7 +547,7 @@
         <h3>Instructions:</h3>
         <ul>
           <li>When you complete a square, share a photo related to your completed task in the Signal group chat.</li>
-          <li>Anita will daub the squares on this board to keep track of everyone's progress.</li>
+          <li>Anita will update this board to keep track of everyone's progress.</li>
         </ul>
       </div>
     </div>
@@ -668,30 +575,15 @@
       </div>
     </div>
   </div>
-  <button type="button" id="editorToggleLink" class="editor-toggle-btn" title="Enable editing" aria-label="Enable editing">🔒</button>
   <hr class="footer-divider">
   <a class="back" href="../">&larr; Back to all projects</a>
   <script>
   (function () {
-    var STORAGE_KEY = 'bingo2026-daubs';
-    var EDITOR_PIN = 'bingo2026';
     var DAUBER_ORDER = ['maya', 'anita', 'shawn', 'marie', 'max', 'mila'];
-    // Baked-in daub state, committed to the repo so everyone sees the same board.
-    var DEFAULT_STATE = {"0":["mila","marie"],"1":["marie","maya","anita","mila"],"2":["mila","marie","maya"],"3":["marie","maya","anita"],"4":["marie","maya","anita","shawn","mila","max"],"5":["shawn","marie","maya"],"6":["marie","maya","mila"],"7":["mila","marie","shawn"],"8":["marie","maya","mila"],"9":["marie","maya","mila"],"10":["marie","maya","anita"],"11":["maya","anita","mila","max"],"12":["marie","anita","shawn"],"14":["mila","marie","maya","anita"],"15":["marie","maya","anita","shawn","max"],"16":["maya","anita","mila"],"17":["marie","maya","anita"],"18":["marie","maya","mila"],"19":["marie","maya","mila"],"21":["mila","maya","max"],"22":["marie","anita"],"23":["marie","maya","anita"],"25":["marie"],"26":["marie","anita","shawn"],"27":["marie"],"28":["marie","anita","mila"],"29":["marie","maya","mila"],"30":["anita","shawn"],"32":["marie","maya","anita","shawn","mila"],"33":["marie"],"34":["marie","maya","anita","shawn","mila"],"35":["marie","maya","anita","shawn","mila"],"37":["marie","maya","anita"],"38":["marie","anita"],"39":["marie","maya","anita"],"40":["marie","maya","anita","mila"],"41":["marie","maya","mila"],"42":["marie","maya","anita"],"44":["marie","maya","anita","shawn","mila","max"],"45":["marie","anita","shawn","mila"],"46":["marie","maya","mila"],"47":["max"],"48":["marie","maya","anita","shawn","max"]};
+    // Daub state, baked in and committed to the repo so everyone sees the same board.
+    var state = {"0":["mila","marie"],"1":["marie","maya","anita","mila"],"2":["mila","marie","maya"],"3":["marie","maya","anita"],"4":["marie","maya","anita","shawn","mila","max"],"5":["shawn","marie","maya"],"6":["marie","maya","mila"],"7":["mila","marie","shawn"],"8":["marie","maya","mila"],"9":["marie","maya","mila"],"10":["marie","maya","anita"],"11":["maya","anita","mila","max"],"12":["marie","anita","shawn"],"14":["mila","marie","maya","anita"],"15":["marie","maya","anita","shawn","max"],"16":["maya","anita","mila"],"17":["marie","maya","anita"],"18":["marie","maya","mila"],"19":["marie","maya","mila"],"21":["mila","maya","max"],"22":["marie","anita"],"23":["marie","maya","anita"],"25":["marie"],"26":["marie","anita","shawn"],"27":["marie"],"28":["marie","anita","mila"],"29":["marie","maya","mila"],"30":["anita","shawn"],"32":["marie","maya","anita","shawn","mila"],"33":["marie"],"34":["marie","maya","anita","shawn","mila"],"35":["marie","maya","anita","shawn","mila"],"37":["marie","maya","anita"],"38":["marie","anita"],"39":["marie","maya","anita"],"40":["marie","maya","anita","mila"],"41":["marie","maya","mila"],"42":["marie","maya","anita"],"44":["marie","maya","anita","shawn","mila","max"],"45":["marie","anita","shawn","mila"],"46":["marie","maya","mila"],"47":["max"],"48":["marie","maya","anita","shawn","max"]};
 
-    var isEditor = false;
-    var selected = null;
     var filterPerson = null;
-    var state = Object.assign({}, DEFAULT_STATE);
-    try {
-      var stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (stored) state = Object.assign({}, DEFAULT_STATE, stored);
-    } catch (e) {}
-
-    function save() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      renderDauberCounts();
-    }
 
     function renderDauberCounts() {
       var total = cards.length;
@@ -707,8 +599,6 @@
 
     var cards = Array.prototype.slice.call(document.querySelectorAll('.grid .card'));
     var daubButtons = Array.prototype.slice.call(document.querySelectorAll('.dauber'));
-    var editorLink = document.getElementById('editorToggleLink');
-    var daubersLabel = document.getElementById('daubersLabel');
 
     function renderBadges(card, index) {
       var photo = card.querySelector('.card-photo');
@@ -751,112 +641,21 @@
       });
     }
 
-    function updateEditorUI() {
-      var label = isEditor ? 'Editing enabled — turn off' : 'Enable editing';
-      editorLink.title = label;
-      editorLink.setAttribute('aria-label', label);
-      editorLink.classList.toggle('active', isEditor);
-      daubersLabel.textContent = isEditor
-        ? 'Pick your photo, then tap a square to daub it'
-        : 'Tap your photo to see what you’ve completed and what’s left';
-    }
-
-    cards.forEach(function (card, index) {
-      card.addEventListener('click', function () {
-        if (!isEditor || !selected) return;
-        var ids = state[index] || [];
-        var pos = ids.indexOf(selected);
-        if (pos === -1) { ids.push(selected); } else { ids.splice(pos, 1); }
-        state[index] = ids;
-        save();
-        renderBadges(card, index);
-      });
-    });
-
     daubButtons.forEach(function (btn) {
       btn.addEventListener('click', function () {
         var id = btn.getAttribute('data-id');
-        if (isEditor) {
-          if (selected === id) {
-            selected = null;
-            btn.classList.remove('selected');
-            document.body.classList.remove('daub-active');
-          } else {
-            daubButtons.forEach(function (b) { b.classList.remove('selected'); });
-            selected = id;
-            btn.classList.add('selected');
-            document.body.classList.add('daub-active');
-          }
+        if (filterPerson === id) {
+          filterPerson = null;
+          btn.classList.remove('selected');
         } else {
-          if (filterPerson === id) {
-            filterPerson = null;
-            btn.classList.remove('selected');
-          } else {
-            daubButtons.forEach(function (b) { b.classList.remove('selected'); });
-            filterPerson = id;
-            btn.classList.add('selected');
-          }
-          renderAll();
+          daubButtons.forEach(function (b) { b.classList.remove('selected'); });
+          filterPerson = id;
+          btn.classList.add('selected');
         }
+        renderAll();
       });
     });
 
-    function exitOrEnterEditorReset() {
-      selected = null;
-      filterPerson = null;
-      daubButtons.forEach(function (b) { b.classList.remove('selected'); });
-      document.body.classList.remove('daub-active');
-      updateEditorUI();
-      renderAll();
-    }
-
-    var pinModal = document.getElementById('pinModal');
-    var pinInput = document.getElementById('pinInput');
-    var pinError = document.getElementById('pinError');
-
-    function openPinModal() {
-      pinError.hidden = true;
-      pinInput.value = '';
-      pinModal.hidden = false;
-      pinInput.focus();
-    }
-
-    function closePinModal() {
-      pinModal.hidden = true;
-    }
-
-    function trySubmitPin() {
-      if (pinInput.value === EDITOR_PIN) {
-        isEditor = true;
-        closePinModal();
-        exitOrEnterEditorReset();
-      } else {
-        pinError.hidden = false;
-        pinInput.value = '';
-        pinInput.focus();
-      }
-    }
-
-    editorLink.addEventListener('click', function (e) {
-      e.preventDefault();
-      if (isEditor) {
-        isEditor = false;
-        exitOrEnterEditorReset();
-      } else {
-        openPinModal();
-      }
-    });
-
-    document.getElementById('pinSubmit').addEventListener('click', trySubmitPin);
-    document.getElementById('pinCancel').addEventListener('click', closePinModal);
-    pinInput.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') trySubmitPin();
-    });
-    pinModal.addEventListener('click', function (e) {
-      if (e.target === pinModal) closePinModal();
-    });
-
-    updateEditorUI();
     renderAll();
     renderDauberCounts();
   })();
