@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bingo 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&family=Caveat:wght@400&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Didact Gothic", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #ffffff;
+      color: #1e1e1e;
+      margin: 0;
+      padding: 40px 20px 80px;
+    }
+    .back {
+      display: block;
+      color: #666;
+      text-decoration: none;
+      font-size: 0.9rem;
+      max-width: 1200px;
+      margin: 0 auto 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #001171;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      letter-spacing: -2px;
+      margin: 0 0 20px;
+    }
+    .intro {
+      max-width: 900px;
+      margin: 0 auto 40px;
+      text-align: center;
+      font-size: 1.15rem;
+      color: #333;
+    }
+    .daubers {
+      max-width: 1400px;
+      margin: 0 auto 40px;
+      text-align: center;
+    }
+    .daubers-label {
+      margin: 0 0 16px;
+      font-size: 1rem;
+      color: #555;
+    }
+    .editor-toggle-btn {
+      display: block;
+      margin: 24px auto 0;
+      background: none;
+      border: none;
+      font-size: 1.6rem;
+      line-height: 1;
+      padding: 8px;
+      cursor: pointer;
+      opacity: 0.45;
+      transition: opacity 0.15s ease;
+    }
+    .editor-toggle-btn:hover {
+      opacity: 0.75;
+    }
+    .editor-toggle-btn.active {
+      opacity: 1;
+    }
+    .pin-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+    .pin-modal[hidden] {
+      display: none;
+    }
+    .pin-modal-box {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 28px;
+      max-width: 320px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    .pin-modal-box p {
+      margin: 0 0 12px;
+      color: #333;
+    }
+    .pin-modal-box input {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 1rem;
+      font-family: inherit;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
+    .pin-modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .pin-modal-actions button {
+      font-family: inherit;
+      font-size: 0.95rem;
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+    #pinCancel {
+      background: #eee;
+      color: #333;
+    }
+    #pinSubmit {
+      background: #001171;
+      color: #fff;
+    }
+    .pin-modal-error {
+      color: #c0392b;
+      font-size: 0.85rem;
+      margin-top: 10px;
+    }
+    .dauber-list {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .dauber {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      outline: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .dauber img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      display: block;
+      transition: transform 0.15s ease;
+    }
+    .dauber:hover img {
+      transform: scale(1.06);
+      filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
+    }
+    .dauber:focus-visible img {
+      outline: 3px solid rgba(0, 0, 0, 0.35);
+      outline-offset: 3px;
+      border-radius: 50%;
+    }
+    .dauber.selected img {
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+    .dauber-count {
+      font-size: 0.7rem;
+      color: #888;
+    }
+    .dauber-name {
+      font-family: "Caveat", cursive;
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: #001171;
+      visibility: hidden;
+      height: 0;
+    }
+    .dauber.selected .dauber-name {
+      visibility: visible;
+      height: auto;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0;
+      max-width: 1400px;
+      margin: 0 auto;
+      border: 4px solid #d3d3d3;
+      border-radius: 10px;
+      overflow: hidden;
+      container-type: inline-size;
+      container-name: board;
+    }
+    .card {
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      padding: clamp(2px, 1.2cqw, 8px);
+      position: relative;
+      container-type: inline-size;
+      container-name: card;
+    }
+    .card.highlight {
+      background: #eef2ff;
+    }
+    body.daub-active .card {
+      cursor: pointer;
+    }
+    .card.dimmed .card-photo > img {
+      filter: grayscale(1) opacity(0.4);
+    }
+    .card-photo {
+      position: relative;
+    }
+    .daub-badges {
+      position: absolute;
+      top: 8px;
+      right: 4cqw;
+      bottom: 8px;
+      left: 4cqw;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: auto auto;
+      align-content: space-between;
+      pointer-events: none;
+    }
+    .card .daub-badges img {
+      width: 30cqw;
+      height: 30cqw;
+      aspect-ratio: 1 / 1;
+      object-fit: contain;
+      border-radius: 0;
+      justify-self: center;
+      align-self: center;
+      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
+    }
+    .card img {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      border-radius: 4px;
+      display: block;
+    }
+    .card p {
+      margin: clamp(2px, 1.5cqw, 8px) 0 2px;
+      text-align: center;
+      font-size: clamp(0.42rem, 6cqw, 0.85rem);
+      line-height: 1.2;
+    }
+    @media (max-width: 700px) {
+      body {
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="pin-modal" id="pinModal" hidden>
+    <div class="pin-modal-box">
+      <p>Enter the editing passphrase</p>
+      <input type="password" id="pinInput" autocomplete="off">
+      <div class="pin-modal-actions">
+        <button type="button" id="pinCancel">Cancel</button>
+        <button type="button" id="pinSubmit">Unlock</button>
+      </div>
+      <p class="pin-modal-error" id="pinError" hidden>Not quite — try again.</p>
+    </div>
+  </div>
+  <a class="back" href="../">&larr; Back to all projects</a>
+  <h1>Bingo 2026!</h1>
+  <p class="intro">The goal of 2026 Bingo is to encourage us to live more broadly and share the year's experiences. Some squares are very specific and others are intentionally vague to let people make them their own.</p>
+  <div class="daubers">
+    <p class="daubers-label" id="daubersLabel">Pick your photo, then tap a square to daub it</p>
+    <div class="dauber-list">
+      <button class="dauber" data-id="maya"><img src="images/participants.png" alt="Maya"><span class="dauber-count"></span><span class="dauber-name">Maya</span></button>
+      <button class="dauber" data-id="anita"><img src="images/participants-1.png" alt="Anita"><span class="dauber-count"></span><span class="dauber-name">Anita</span></button>
+      <button class="dauber" data-id="shawn"><img src="images/participants-2.png" alt="Shawn"><span class="dauber-count"></span><span class="dauber-name">Shawn</span></button>
+      <button class="dauber" data-id="marie"><img src="images/participants-3.png" alt="Marie"><span class="dauber-count"></span><span class="dauber-name">Marie</span></button>
+      <button class="dauber" data-id="max"><img src="images/participants-4.png" alt="Max"><span class="dauber-count"></span><span class="dauber-name">Max</span></button>
+      <button class="dauber" data-id="mila"><img src="images/participants-5.png" alt="Mila"><span class="dauber-count"></span><span class="dauber-name">Mila</span></button>
+    </div>
+  </div>
+  <div class="grid">
+      <div class="card highlight">
+        <div class="card-photo">
+          <img src="images/01.png" alt="" loading="lazy">
+        </div>
+        <p>Learn and share a folk tale</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/02.png" alt="" loading="lazy">
+        </div>
+        <p>Draw or paint something</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/03.png" alt="" loading="lazy">
+        </div>
+        <p>Visit a museum or gallery</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/04.png" alt="" loading="lazy">
+        </div>
+        <p>Try a new culture-specific food</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/05.png" alt="" loading="lazy">
+        </div>
+        <p>Celebrate Canada Day</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/06.png" alt="" loading="lazy">
+        </div>
+        <p>Read a Maya-recommended book</p>
+      </div>
+      <div class="card highlight">
+        <div class="card-photo">
+          <img src="images/07.png" alt="" loading="lazy">
+        </div>
+        <p>Take a selfie with a bird</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/08.png" alt="" loading="lazy">
+        </div>
+        <p>Help a stranger</p>
+      </div>
+      <div class="card highlight">
+        <div class="card-photo">
+          <img src="images/09.png" alt="" loading="lazy">
+        </div>
+        <p>Be 365m+ above sea level</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/10.png" alt="" loading="lazy">
+        </div>
+        <p>Celebrate a historical day</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/11.png" alt="" loading="lazy">
+        </div>
+        <p>Make or bake a Rosi recipe</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/12.png" alt="" loading="lazy">
+        </div>
+        <p>Learn a new skill</p>
+      </div>
+      <div class="card highlight">
+        <div class="card-photo">
+          <img src="images/13.png" alt="" loading="lazy">
+        </div>
+        <p>Handcraft something</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/14.png" alt="" loading="lazy">
+        </div>
+        <p>Swim in the ocean</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/15.png" alt="" loading="lazy">
+        </div>
+        <p>Play a new game</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/16.png" alt="" loading="lazy">
+        </div>
+        <p>Eat a heart</p>
+      </div>
+      <div class="card highlight">
+        <div class="card-photo">
+          <img src="images/17.png" alt="" loading="lazy">
+        </div>
+        <p>Sweat it out</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/18.png" alt="" loading="lazy">
+        </div>
+        <p>Be on a boat</p>
+      </div>
+      <div class="card highlight">
+        <div class="card-photo">
+          <img src="images/19.png" alt="" loading="lazy">
+        </div>
+        <p>Get fancy</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/20.png" alt="" loading="lazy">
+        </div>
+        <p>Learn and share a poem</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/21.png" alt="" loading="lazy">
+        </div>
+        <p>Celebrate Pumpkin season</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/22.png" alt="" loading="lazy">
+        </div>
+        <p>Sport</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/23.png" alt="" loading="lazy">
+        </div>
+        <p>Winter wonder-selfie</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/24.png" alt="" loading="lazy">
+        </div>
+        <p>Re-watch a favourite movie</p>
+      </div>
+      <div class="card highlight">
+        <div class="card-photo">
+          <img src="images/25.png" alt="" loading="lazy">
+        </div>
+        <p>Help out a homeless animal</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/26.png" alt="" loading="lazy">
+        </div>
+        <p>Pyjama day</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/27.png" alt="" loading="lazy">
+        </div>
+        <p>Go on a roadtrip</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/28.png" alt="" loading="lazy">
+        </div>
+        <p>Consume black</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/29.png" alt="" loading="lazy">
+        </div>
+        <p>Support a small business</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/30.png" alt="" loading="lazy">
+        </div>
+        <p>Help out a cat or visit a cat cafe</p>
+      </div>
+      <div class="card highlight">
+        <div class="card-photo">
+          <img src="images/31.png" alt="" loading="lazy">
+        </div>
+        <p>Watch a Marie recommended movie</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/32.png" alt="" loading="lazy">
+        </div>
+        <p>Decorate for Christmas</p>
+      </div>
+      <div class="card highlight">
+        <div class="card-photo">
+          <img src="images/33.png" alt="" loading="lazy">
+        </div>
+        <p>Take a hike…somewhere new</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/34.png" alt="" loading="lazy">
+        </div>
+        <p>Experience blue</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/35.png" alt="" loading="lazy">
+        </div>
+        <p>Partake in any Peet favourite</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/36.png" alt="" loading="lazy">
+        </div>
+        <p>April showers, bring selfie with flowers</p>
+      </div>
+      <div class="card highlight">
+        <div class="card-photo">
+          <img src="images/37.png" alt="" loading="lazy">
+        </div>
+        <p>Capture autumnal neighbourhood colours</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/38.png" alt="" loading="lazy">
+        </div>
+        <p>Send a handwritten letter or postcard</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/39.png" alt="" loading="lazy">
+        </div>
+        <p>Learn yes, no, hello, goodbye, please, thank you in sign language</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/40.png" alt="" loading="lazy">
+        </div>
+        <p>Listen to a Max-recommended song</p>
+      </div>
+      <div class="card highlight">
+        <div class="card-photo">
+          <img src="images/41.png" alt="" loading="lazy">
+        </div>
+        <p>Savour snow or sand</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/42.png" alt="" loading="lazy">
+        </div>
+        <p>Make a positive environmental impact</p>
+      </div>
+      <div class="card highlight">
+        <div class="card-photo">
+          <img src="images/43.png" alt="" loading="lazy">
+        </div>
+        <p>Travel somewhere new</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/44.png" alt="" loading="lazy">
+        </div>
+        <p>Learn yes, no, hello, goodbye, please, thank you in 3 new languages</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/45.png" alt="" loading="lazy">
+        </div>
+        <p>Try a new beverage</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/46.png" alt="" loading="lazy">
+        </div>
+        <p>Fix a broken thing</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/47.png" alt="" loading="lazy">
+        </div>
+        <p>Build or solve a puzzle</p>
+      </div>
+      <div class="card">
+        <div class="card-photo">
+          <img src="images/48.png" alt="" loading="lazy">
+        </div>
+        <p>Participate in a charity fundraiser</p>
+      </div>
+      <div class="card highlight">
+        <div class="card-photo">
+          <img src="images/49.png" alt="" loading="lazy">
+        </div>
+        <p>Celebrate bunnies or eggs</p>
+      </div>
+  </div>
+  <button type="button" id="editorToggleLink" class="editor-toggle-btn" title="Enable editing" aria-label="Enable editing">✏️</button>
+  <button type="button" id="exportStateBtn" class="editor-toggle-btn" title="Copy code to commit" aria-label="Copy code to commit" hidden>📋</button>
+  <script>
+  (function () {
+    var STORAGE_KEY = 'bingo2026-daubs';
+    var EDITOR_KEY = 'bingo2026-is-editor';
+    var EDITOR_PIN = 'bingo2026';
+    var DAUBER_ORDER = ['maya', 'anita', 'shawn', 'marie', 'max', 'mila'];
+    // Baked-in daub state, committed to the repo so everyone sees the same board.
+    // After daubing, click "Copy code to commit" and paste the result here.
+    var DEFAULT_STATE = {};
+
+    var isEditor = localStorage.getItem(EDITOR_KEY) === 'true';
+    var selected = null;
+    var filterPerson = null;
+    var state = Object.assign({}, DEFAULT_STATE);
+    try {
+      var stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (stored) state = Object.assign({}, DEFAULT_STATE, stored);
+    } catch (e) {}
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      renderDauberCounts();
+    }
+
+    function renderDauberCounts() {
+      var total = cards.length;
+      DAUBER_ORDER.forEach(function (id) {
+        var count = 0;
+        Object.keys(state).forEach(function (index) {
+          if ((state[index] || []).indexOf(id) !== -1) count++;
+        });
+        var el = document.querySelector('.dauber[data-id="' + id + '"] .dauber-count');
+        if (el) el.textContent = count + '/' + total;
+      });
+    }
+
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.grid .card'));
+    var daubButtons = Array.prototype.slice.call(document.querySelectorAll('.dauber'));
+    var editorLink = document.getElementById('editorToggleLink');
+    var exportBtn = document.getElementById('exportStateBtn');
+    var daubersLabel = document.getElementById('daubersLabel');
+
+    function renderBadges(card, index) {
+      var photo = card.querySelector('.card-photo');
+      var wrap = photo.querySelector('.daub-badges');
+      if (!wrap) {
+        wrap = document.createElement('div');
+        wrap.className = 'daub-badges';
+        photo.appendChild(wrap);
+      }
+      wrap.innerHTML = '';
+      var ids = state[index] || [];
+      var idsToShow = filterPerson ? ids.filter(function (id) { return id === filterPerson; }) : ids;
+      DAUBER_ORDER.forEach(function (id, slot) {
+        if (idsToShow.indexOf(id) === -1) return;
+        var sourceImg = document.querySelector('.dauber[data-id="' + id + '"] img');
+        if (!sourceImg) return;
+        var img = document.createElement('img');
+        img.src = sourceImg.getAttribute('src');
+        img.alt = id;
+        img.title = id;
+        img.style.gridColumn = (slot % 3) + 1;
+        img.style.gridRow = Math.floor(slot / 3) + 1;
+        wrap.appendChild(img);
+      });
+    }
+
+    function applyFilter(card, index) {
+      if (!filterPerson) {
+        card.classList.remove('dimmed');
+        return;
+      }
+      var ids = state[index] || [];
+      card.classList.toggle('dimmed', ids.indexOf(filterPerson) !== -1);
+    }
+
+    function renderAll() {
+      cards.forEach(function (card, index) {
+        renderBadges(card, index);
+        applyFilter(card, index);
+      });
+    }
+
+    function updateEditorUI() {
+      var label = isEditor ? 'Editing enabled — turn off' : 'Enable editing';
+      editorLink.title = label;
+      editorLink.setAttribute('aria-label', label);
+      editorLink.classList.toggle('active', isEditor);
+      exportBtn.hidden = !isEditor;
+      daubersLabel.textContent = isEditor
+        ? 'Pick your photo, then tap a square to daub it'
+        : 'Tap your photo to see what you’ve completed';
+    }
+
+    exportBtn.addEventListener('click', function () {
+      var code = 'var DEFAULT_STATE = ' + JSON.stringify(state) + ';';
+      var done = function () {
+        exportBtn.textContent = '✅';
+        setTimeout(function () { exportBtn.textContent = '📋'; }, 1200);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(done, function () { prompt('Copy this code:', code); });
+      } else {
+        prompt('Copy this code:', code);
+      }
+    });
+
+    cards.forEach(function (card, index) {
+      card.addEventListener('click', function () {
+        if (!isEditor || !selected) return;
+        var ids = state[index] || [];
+        var pos = ids.indexOf(selected);
+        if (pos === -1) { ids.push(selected); } else { ids.splice(pos, 1); }
+        state[index] = ids;
+        save();
+        renderBadges(card, index);
+      });
+    });
+
+    daubButtons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.getAttribute('data-id');
+        if (isEditor) {
+          if (selected === id) {
+            selected = null;
+            btn.classList.remove('selected');
+            document.body.classList.remove('daub-active');
+          } else {
+            daubButtons.forEach(function (b) { b.classList.remove('selected'); });
+            selected = id;
+            btn.classList.add('selected');
+            document.body.classList.add('daub-active');
+          }
+        } else {
+          if (filterPerson === id) {
+            filterPerson = null;
+            btn.classList.remove('selected');
+          } else {
+            daubButtons.forEach(function (b) { b.classList.remove('selected'); });
+            filterPerson = id;
+            btn.classList.add('selected');
+          }
+          renderAll();
+        }
+      });
+    });
+
+    function exitOrEnterEditorReset() {
+      selected = null;
+      filterPerson = null;
+      daubButtons.forEach(function (b) { b.classList.remove('selected'); });
+      document.body.classList.remove('daub-active');
+      updateEditorUI();
+      renderAll();
+    }
+
+    var pinModal = document.getElementById('pinModal');
+    var pinInput = document.getElementById('pinInput');
+    var pinError = document.getElementById('pinError');
+
+    function openPinModal() {
+      pinError.hidden = true;
+      pinInput.value = '';
+      pinModal.hidden = false;
+      pinInput.focus();
+    }
+
+    function closePinModal() {
+      pinModal.hidden = true;
+    }
+
+    function trySubmitPin() {
+      if (pinInput.value === EDITOR_PIN) {
+        isEditor = true;
+        localStorage.setItem(EDITOR_KEY, 'true');
+        closePinModal();
+        exitOrEnterEditorReset();
+      } else {
+        pinError.hidden = false;
+        pinInput.value = '';
+        pinInput.focus();
+      }
+    }
+
+    editorLink.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (isEditor) {
+        isEditor = false;
+        localStorage.setItem(EDITOR_KEY, 'false');
+        exitOrEnterEditorReset();
+      } else {
+        openPinModal();
+      }
+    });
+
+    document.getElementById('pinSubmit').addEventListener('click', trySubmitPin);
+    document.getElementById('pinCancel').addEventListener('click', closePinModal);
+    pinInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') trySubmitPin();
+    });
+    pinModal.addEventListener('click', function (e) {
+      if (e.target === pinModal) closePinModal();
+    });
+
+    updateEditorUI();
+    renderAll();
+    renderDauberCounts();
+  })();
+  </script>
+</body>
+</html>
