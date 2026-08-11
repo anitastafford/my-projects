@@ -73,7 +73,7 @@
     border-radius: 12px;
     padding: 16px 18px 18px;
   }
-  .score-card.p1 { background: #d9f5ea; }
+  .score-card.p1 { background: #fdf1c7; }
   .score-card.p2 { background: #e2e2fb; }
   .score-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 12px; }
   .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -82,18 +82,14 @@
   .score-tile .lbl { font-size: 0.62rem; letter-spacing: 0.04em; color: #555; text-transform: uppercase; margin-top: 2px; }
   .tie-note { text-align: center; color: #888; font-size: 0.85rem; margin-top: 14px; }
 
-  .track-wrap { padding: 40px 10px 8px; }
+  .track-wrap { padding: 28px 14px 24px; }
   .track { position: relative; height: 4px; background: #eee; border-radius: 2px; }
   .track-fill { position: absolute; top: 0; left: 0; height: 4px; background: #e0455f; border-radius: 2px; }
   .marker {
     position: absolute;
-    top: -34px;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: 0.72rem;
-    white-space: nowrap;
+    top: 2px;
+    transform: translate(-50%, -50%);
+    z-index: 2;
   }
   .marker .pill {
     width: 26px;
@@ -102,11 +98,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
   }
-  .marker.p1 .pill { background: #0f9d78; }
-  .marker.p2 .pill { background: #4c4fd1; }
+  .marker.p1 .pill { background: #fdf1c7; }
+  .marker.p2 .pill { background: #e2e2fb; }
   .marker .emoji { font-size: 1rem; display: inline-block; line-height: 1; }
-  .marker.shift-up { top: -54px; }
+  .marker.shift-up { transform: translate(-50%, calc(-50% - 11px)); z-index: 3; }
   .tick { position: absolute; top: -2px; width: 1px; height: 8px; background: #ccc; }
   .tick-label {
     position: absolute;
@@ -139,18 +137,56 @@
   .legend { display: flex; gap: 14px; font-size: 0.75rem; color: #555; margin-bottom: 6px; }
   .legend span { display: inline-flex; align-items: center; gap: 5px; }
   .legend i { width: 10px; height: 2px; display: inline-block; }
-  .legend .p1 { background: #0f9d78; }
-  .legend .p2 { background: #4c4fd1; }
+  .legend .p1 { background: #e8c14c; }
+  .legend .p2 { background: #9a9ae8; }
 
   table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
   th { text-align: left; font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; color: #888; font-weight: 600; padding: 0 8px 8px; border-bottom: 1px solid #eee; }
   td { padding: 10px 8px; border-bottom: 1px solid #f2f2f2; }
   .badge { padding: 2px 10px; border-radius: 999px; font-size: 0.76rem; font-weight: 700; }
-  .badge.p1 { background: #d9f5ea; color: #0f9d78; }
+  .badge.p1 { background: #fdf1c7; color: #92700a; }
   .badge.p2 { background: #e2e2fb; color: #4c4fd1; }
   .badge.tie { background: #eee; color: #777; }
-  .del-btn { background: none; border: none; color: #d1445a; cursor: pointer; font-size: 0.85rem; padding: 0; }
-  .del-btn:hover { text-decoration: underline; }
+  .badge.pending { background: #f5f5f5; color: #aaa; }
+  .row-actions { display: flex; gap: 4px; }
+  .icon-btn {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: #888;
+    padding: 0;
+  }
+  .icon-btn:hover { background: #f2f2f2; }
+  .icon-btn.edit-btn:hover { color: #333; }
+  .icon-btn.del-btn:hover { color: #d1445a; }
+  .save-btn, .cancel-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+  .save-btn { color: #0f9d78; }
+  .save-btn:hover { background: #d9f5ea; }
+  .cancel-btn { color: #888; }
+  .cancel-btn:hover { background: #f2f2f2; }
+  .edit-input {
+    width: 90px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    padding: 5px 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+  }
   .empty-state { color: #999; font-size: 0.9rem; padding: 8px 0; }
 </style>
 </head>
@@ -188,14 +224,14 @@
         <input id="log-date" type="date" required>
       </div>
       <div class="field">
-        <label id="p1-steps-label" for="p1-steps">Steps</label>
-        <input id="p1-steps" type="number" min="0" placeholder="e.g. 8200" required>
+        <label for="log-participant">Who</label>
+        <select id="log-participant"></select>
       </div>
       <div class="field">
-        <label id="p2-steps-label" for="p2-steps">Steps</label>
-        <input id="p2-steps" type="number" min="0" placeholder="e.g. 7600" required>
+        <label for="log-steps">Steps</label>
+        <input id="log-steps" type="number" min="0" placeholder="e.g. 8200" required>
       </div>
-      <button type="submit" class="primary">Save day</button>
+      <button type="submit" class="primary">Save</button>
     </form>
   </div>
 
@@ -274,7 +310,11 @@ function loadCache() {
 function entriesObjToArray(obj) {
   if (!obj) return [];
   return Object.entries(obj)
-    .map(([date, v]) => ({ date, p1: Number(v.p1) || 0, p2: Number(v.p2) || 0 }))
+    .map(([date, v]) => ({
+      date,
+      p1: v && v.p1 != null ? Number(v.p1) : null,
+      p2: v && v.p2 != null ? Number(v.p2) : null,
+    }))
     .sort((a, b) => a.date.localeCompare(b.date));
 }
 
@@ -342,6 +382,24 @@ async function pushEntry(date, p1, p2) {
   }
 }
 
+async function pushEntryField(date, playerKey, steps) {
+  const existing = entries.find((e) => e.date === date) || { date, p1: null, p2: null };
+  const updated = { ...existing, [playerKey]: steps };
+  entries = entries.filter((e) => e.date !== date).concat([updated]).sort((a, b) => a.date.localeCompare(b.date));
+  render();
+  try {
+    await fetch(`${DB_URL}/entries/${date}/${playerKey}.json`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(steps),
+    });
+    cacheLocally();
+    setStatus(`Synced with shared database · last update ${new Date().toLocaleTimeString()}`);
+  } catch {
+    setStatus("Saved on this device only — couldn't reach the shared database.", true);
+  }
+}
+
 async function deleteEntry(date) {
   entries = entries.filter((e) => e.date !== date);
   render();
@@ -357,20 +415,22 @@ async function deleteEntry(date) {
 function fmt(n) { return Math.round(n).toLocaleString(); }
 
 function winnerOf(entry) {
+  if (entry.p1 == null || entry.p2 == null) return "pending";
   if (entry.p1 > entry.p2) return "p1";
   if (entry.p2 > entry.p1) return "p2";
   return "tie";
 }
 
 function statsFor(playerKey, entries) {
-  const total = entries.reduce((sum, e) => sum + e[playerKey], 0);
-  const avg = entries.length ? total / entries.length : 0;
+  const logged = entries.filter((e) => e[playerKey] != null);
+  const total = logged.reduce((sum, e) => sum + e[playerKey], 0);
+  const avg = logged.length ? total / logged.length : 0;
   const daysWon = entries.filter((e) => winnerOf(e) === playerKey).length;
   let streak = 0;
   for (let i = entries.length - 1; i >= 0; i--) {
     const w = winnerOf(entries[i]);
     if (w === playerKey) streak++;
-    else if (w === "tie") continue;
+    else if (w === "tie" || w === "pending") continue;
     else break;
   }
   return { total, avg, daysWon, streak };
@@ -387,8 +447,15 @@ function render() {
       .map(([key, r]) => `<option value="${key}" ${key === settings.route ? "selected" : ""}>${r.label}</option>`)
       .join("");
   }
-  document.getElementById("p1-steps-label").textContent = `${settings.p1Name} steps`;
-  document.getElementById("p2-steps-label").textContent = `${settings.p2Name} steps`;
+  const participantSelect = document.getElementById("log-participant");
+  if (active !== "log-participant") {
+    const prevVal = participantSelect.value || "p1";
+    participantSelect.innerHTML = `
+      <option value="p1">${settings.p1Name}</option>
+      <option value="p2">${settings.p2Name}</option>
+    `;
+    participantSelect.value = prevVal;
+  }
   if (!document.getElementById("log-date").value) {
     document.getElementById("log-date").value = new Date().toISOString().slice(0, 10);
   }
@@ -460,7 +527,7 @@ function renderMap(settings, entries) {
   });
 
   if (!playerMarkers.p1) {
-    playerMarkers.p1 = L.marker(pos1, { icon: icon("🐻") }).addTo(leafletMap);
+    playerMarkers.p1 = L.marker(pos1, { icon: icon("🦊") }).addTo(leafletMap);
     playerMarkers.p2 = L.marker(pos2, { icon: icon("🐯") }).addTo(leafletMap);
   } else {
     playerMarkers.p1.setLatLng(pos1);
@@ -530,7 +597,7 @@ function renderRace(settings, entries) {
       <div class="track">
         <div class="track-fill" style="width:${maxPct}%"></div>
         <div class="marker p1" style="left:${pct1}%">
-          <span class="pill"><span class="emoji">🐻</span></span>
+          <span class="pill"><span class="emoji">🦊</span></span>
         </div>
         <div class="marker p2 ${close ? "shift-up" : ""}" style="left:${pct2}%">
           <span class="pill"><span class="emoji">🐯</span></span>
@@ -549,13 +616,14 @@ function renderRace(settings, entries) {
 }
 
 function svgLineChart(entries, key1, key2, cumulative) {
-  const w = 420, h = 220, padL = 44, padR = 10, padT = 10, padB = 26;
+  const w = 420, h = 220, padL = 44, padR = 26, padT = 16, padB = 26;
   const dates = entries.map((e) => e.date);
   const seriesFor = (key) => {
     let running = 0;
     return entries.map((e) => {
-      running += e[key];
-      return cumulative ? running : e[key];
+      const v = e[key] ?? 0;
+      running += v;
+      return cumulative ? running : v;
     });
   };
   const v1 = seriesFor(key1);
@@ -580,17 +648,28 @@ function svgLineChart(entries, key1, key2, cumulative) {
     return `<text x="${x(i)}" y="${h - 6}" font-size="9" fill="#999" text-anchor="middle">${d.slice(5)}</text>`;
   }).join("");
 
-  const dots = (vals, color) => vals.map((v, i) =>
+  const dots = (vals, color) => vals.slice(0, -1).map((v, i) =>
     `<circle cx="${x(i)}" cy="${y(v)}" r="2.5" fill="${color}" />`).join("");
+
+  const endEmoji = (vals, emoji, bg) => {
+    const i = vals.length - 1;
+    const cx = x(i), cy = y(vals[i]);
+    return `
+      <circle cx="${cx}" cy="${cy}" r="17" fill="${bg}" stroke="#fff" stroke-width="2" />
+      <text x="${cx}" y="${cy + 7}" font-size="20" text-anchor="middle">${emoji}</text>
+    `;
+  };
 
   return `
     <svg viewBox="0 0 ${w} ${h}" style="width:100%; height:auto;">
       ${gridLines}
       ${xLabels}
-      <path d="${path(v1)}" fill="none" stroke="#0f9d78" stroke-width="2" />
-      <path d="${path(v2)}" fill="none" stroke="#4c4fd1" stroke-width="2" />
-      ${dots(v1, "#0f9d78")}
-      ${dots(v2, "#4c4fd1")}
+      <path d="${path(v1)}" fill="none" stroke="#e8c14c" stroke-width="2" />
+      <path d="${path(v2)}" fill="none" stroke="#9a9ae8" stroke-width="2" />
+      ${dots(v1, "#e8c14c")}
+      ${dots(v2, "#9a9ae8")}
+      ${endEmoji(v1, "🦊", "#fdf1c7")}
+      ${endEmoji(v2, "🐯", "#e2e2fb")}
     </svg>
   `;
 }
@@ -622,6 +701,8 @@ function renderCharts(settings, entries) {
   `;
 }
 
+let editingDate = null;
+
 function renderHistory(settings, entries) {
   const el = document.getElementById("history");
   if (!entries.length) {
@@ -629,17 +710,35 @@ function renderHistory(settings, entries) {
     return;
   }
   const rows = [...entries].reverse().map((e) => {
+    if (e.date === editingDate) {
+      return `
+        <tr>
+          <td>${e.date}</td>
+          <td><input class="edit-input" type="number" min="0" id="edit-p1" value="${e.p1 ?? ""}"></td>
+          <td><input class="edit-input" type="number" min="0" id="edit-p2" value="${e.p2 ?? ""}"></td>
+          <td></td>
+          <td class="row-actions">
+            <button class="save-btn" data-date="${e.date}">Save</button>
+            <button class="cancel-btn">Cancel</button>
+          </td>
+        </tr>`;
+    }
     const w = winnerOf(e);
-    const badge = w === "tie"
+    const badge = w === "pending"
+      ? `<span class="badge pending">Pending</span>`
+      : w === "tie"
       ? `<span class="badge tie">Tie</span>`
       : `<span class="badge ${w}">${w === "p1" ? settings.p1Name : settings.p2Name}</span>`;
     return `
       <tr>
         <td>${e.date}</td>
-        <td>${fmt(e.p1)}</td>
-        <td>${fmt(e.p2)}</td>
+        <td>${e.p1 != null ? fmt(e.p1) : "–"}</td>
+        <td>${e.p2 != null ? fmt(e.p2) : "–"}</td>
         <td>${badge}</td>
-        <td><button class="del-btn" data-date="${e.date}">Delete</button></td>
+        <td class="row-actions">
+          <button class="icon-btn edit-btn" data-date="${e.date}" title="Edit" aria-label="Edit">✎</button>
+          <button class="icon-btn del-btn" data-date="${e.date}" title="Delete" aria-label="Delete">🗑</button>
+        </td>
       </tr>`;
   }).join("");
 
@@ -658,6 +757,30 @@ function renderHistory(settings, entries) {
     </table>
   `;
 
+  el.querySelectorAll(".edit-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      editingDate = btn.dataset.date;
+      renderHistory(settings, entries);
+    });
+  });
+  el.querySelectorAll(".cancel-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      editingDate = null;
+      renderHistory(settings, entries);
+    });
+  });
+  el.querySelectorAll(".save-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const date = btn.dataset.date;
+      const p1raw = document.getElementById("edit-p1").value;
+      const p2raw = document.getElementById("edit-p2").value;
+      const p1 = p1raw === "" ? null : Number(p1raw);
+      const p2 = p2raw === "" ? null : Number(p2raw);
+      if (Number.isNaN(p1) || Number.isNaN(p2)) return;
+      editingDate = null;
+      pushEntry(date, p1, p2);
+    });
+  });
   el.querySelectorAll(".del-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       deleteEntry(btn.dataset.date);
@@ -677,12 +800,11 @@ document.getElementById("setup-form").addEventListener("submit", (ev) => {
 document.getElementById("log-form").addEventListener("submit", (ev) => {
   ev.preventDefault();
   const date = document.getElementById("log-date").value;
-  const p1 = Number(document.getElementById("p1-steps").value);
-  const p2 = Number(document.getElementById("p2-steps").value);
-  if (!date || Number.isNaN(p1) || Number.isNaN(p2)) return;
-  pushEntry(date, p1, p2);
-  document.getElementById("p1-steps").value = "";
-  document.getElementById("p2-steps").value = "";
+  const who = document.getElementById("log-participant").value;
+  const steps = Number(document.getElementById("log-steps").value);
+  if (!date || !who || Number.isNaN(steps)) return;
+  pushEntryField(date, who, steps);
+  document.getElementById("log-steps").value = "";
 });
 
 render();
