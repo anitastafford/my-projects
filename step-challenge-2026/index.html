@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Step Challenge</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f0f0f0;
+    color: #1e1e1e;
+    margin: 0;
+    padding: 40px 20px 80px;
+  }
+  .back {
+    display: block;
+    color: #666;
+    text-decoration: none;
+    font-size: 0.9rem;
+    max-width: 900px;
+    margin: 0 auto 20px;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 1.7rem; margin: 0 0 4px; }
+  .subtitle { color: #666; margin: 0 0 28px; font-size: 0.95rem; }
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px 24px 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #888;
+    text-transform: uppercase;
+    margin: 0 0 16px;
+  }
+  .field-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+  .field { display: flex; flex-direction: column; gap: 6px; flex: 1 1 160px; min-width: 140px; }
+  .field label { font-size: 0.78rem; color: #666; }
+  .field input, .field select {
+    font-family: inherit;
+    font-size: 0.95rem;
+    padding: 9px 11px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    color: #1e1e1e;
+  }
+  .field input::placeholder { color: #b3b3b3; }
+  button.primary {
+    background: #111;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  button.primary:hover { background: #333; }
+
+  .scoreboard { display: flex; gap: 16px; flex-wrap: wrap; }
+  .score-card {
+    flex: 1 1 260px;
+    border-radius: 12px;
+    padding: 16px 18px 18px;
+  }
+  .score-card.p1 { background: #d9f5ea; }
+  .score-card.p2 { background: #e2e2fb; }
+  .score-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 12px; }
+  .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .score-tile { background: rgba(255,255,255,0.6); border-radius: 8px; padding: 10px 8px; text-align: center; }
+  .score-tile .val { font-size: 1.4rem; font-weight: 700; line-height: 1.1; }
+  .score-tile .lbl { font-size: 0.62rem; letter-spacing: 0.04em; color: #555; text-transform: uppercase; margin-top: 2px; }
+  .tie-note { text-align: center; color: #888; font-size: 0.85rem; margin-top: 14px; }
+
+  .track-wrap { padding: 40px 10px 8px; }
+  .track { position: relative; height: 4px; background: #eee; border-radius: 2px; }
+  .track-fill { position: absolute; top: 0; left: 0; height: 4px; background: #e0455f; border-radius: 2px; }
+  .marker {
+    position: absolute;
+    top: -34px;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.72rem;
+    white-space: nowrap;
+  }
+  .marker .pill {
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .marker.p1 .pill { background: #0f9d78; }
+  .marker.p2 .pill { background: #4c4fd1; }
+  .marker .emoji { font-size: 1rem; display: inline-block; line-height: 1; }
+  .marker.shift-up { top: -54px; }
+  .tick { position: absolute; top: -2px; width: 1px; height: 8px; background: #ccc; }
+  .tick-label {
+    position: absolute;
+    top: 12px;
+    transform: translateX(-50%);
+    font-size: 0.62rem;
+    color: #999;
+    white-space: nowrap;
+  }
+  .race-distances {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #555;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  #route-map {
+    height: 320px;
+    border-radius: 10px;
+    margin-top: 20px;
+    overflow: hidden;
+  }
+  .map-pin { font-size: 1.3rem; line-height: 1; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4)); }
+
+  .charts { display: flex; gap: 20px; flex-wrap: wrap; }
+  .chart-box { flex: 1 1 320px; min-width: 280px; }
+  .chart-title { font-size: 0.82rem; font-weight: 600; margin: 0 0 8px; }
+  .legend { display: flex; gap: 14px; font-size: 0.75rem; color: #555; margin-bottom: 6px; }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend i { width: 10px; height: 2px; display: inline-block; }
+  .legend .p1 { background: #0f9d78; }
+  .legend .p2 { background: #4c4fd1; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th { text-align: left; font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; color: #888; font-weight: 600; padding: 0 8px 8px; border-bottom: 1px solid #eee; }
+  td { padding: 10px 8px; border-bottom: 1px solid #f2f2f2; }
+  .badge { padding: 2px 10px; border-radius: 999px; font-size: 0.76rem; font-weight: 700; }
+  .badge.p1 { background: #d9f5ea; color: #0f9d78; }
+  .badge.p2 { background: #e2e2fb; color: #4c4fd1; }
+  .badge.tie { background: #eee; color: #777; }
+  .del-btn { background: none; border: none; color: #d1445a; cursor: pointer; font-size: 0.85rem; padding: 0; }
+  .del-btn:hover { text-decoration: underline; }
+  .empty-state { color: #999; font-size: 0.9rem; padding: 8px 0; }
+</style>
+</head>
+<body>
+<a class="back" href="../">&larr; Back to all projects</a>
+<div class="wrap">
+  <h1>Step Challenge</h1>
+  <p class="subtitle">Log your steps, race down the trail, and see who's ahead.</p>
+  <p id="sync-status" style="font-size:0.78rem; color:#999; margin:-16px 0 20px;"></p>
+
+  <div class="card">
+    <p class="card-title">Setup</p>
+    <form id="setup-form" class="field-row">
+      <div class="field">
+        <label for="p1-name">Player 1 name</label>
+        <input id="p1-name" type="text" required>
+      </div>
+      <div class="field">
+        <label for="p2-name">Player 2 name</label>
+        <input id="p2-name" type="text" required>
+      </div>
+      <div class="field" style="flex: 2 1 320px;">
+        <label for="route-select">Route</label>
+        <select id="route-select"></select>
+      </div>
+      <button type="submit" class="primary">Save</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <p class="card-title">Log today's steps</p>
+    <form id="log-form" class="field-row">
+      <div class="field">
+        <label for="log-date">Date</label>
+        <input id="log-date" type="date" required>
+      </div>
+      <div class="field">
+        <label id="p1-steps-label" for="p1-steps">Steps</label>
+        <input id="p1-steps" type="number" min="0" placeholder="e.g. 8200" required>
+      </div>
+      <div class="field">
+        <label id="p2-steps-label" for="p2-steps">Steps</label>
+        <input id="p2-steps" type="number" min="0" placeholder="e.g. 7600" required>
+      </div>
+      <button type="submit" class="primary">Save day</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <p class="card-title">Scoreboard</p>
+    <div id="scoreboard"></div>
+  </div>
+
+  <div class="card">
+    <p class="card-title">Race along the route</p>
+    <div id="race"></div>
+    <div id="route-map"></div>
+  </div>
+
+  <div class="card">
+    <p class="card-title">Charts</p>
+    <div id="charts"></div>
+  </div>
+
+  <div class="card">
+    <p class="card-title">History</p>
+    <div id="history"></div>
+  </div>
+</div>
+
+<script>
+const DB_URL = "https://nitaki-007-default-rtdb.europe-west1.firebasedatabase.app";
+const CACHE_KEY = "stepChallenge.cache";
+const STEPS_PER_KM = 1250;
+
+const ROUTES = {
+  "hadrians-wall": {
+    label: "Hadrian's Wall Path — Wallsend to Bowness-on-Solway (135 km)",
+    totalKm: 135,
+    waypoints: [
+      { name: "Wallsend", km: 0, lat: 54.9906, lng: -1.5350 },
+      { name: "Heddon-on-the-Wall", km: 15, lat: 54.9975, lng: -1.7891 },
+      { name: "Chollerford", km: 35, lat: 55.0270, lng: -2.0520 },
+      { name: "Housesteads", km: 48, lat: 55.0130, lng: -2.3310 },
+      { name: "Greenhead", km: 65, lat: 54.9800, lng: -2.5310 },
+      { name: "Birdoswald", km: 76, lat: 54.9890, lng: -2.6050 },
+      { name: "Carlisle", km: 103, lat: 54.8951, lng: -2.9382 },
+      { name: "Bowness-on-Solway", km: 135, lat: 54.9530, lng: -3.2010 },
+    ],
+  },
+  "camino-frances": {
+    label: "Camino de Santiago — Sarria to Santiago de Compostela (115 km)",
+    totalKm: 115,
+    waypoints: [
+      { name: "Sarria", km: 0, lat: 42.7805, lng: -7.4142 },
+      { name: "Portomarín", km: 22, lat: 42.8075, lng: -7.6159 },
+      { name: "Palas de Rei", km: 45, lat: 42.8730, lng: -7.8688 },
+      { name: "Melide", km: 58, lat: 42.9145, lng: -8.0142 },
+      { name: "Arzúa", km: 69, lat: 42.9280, lng: -8.1590 },
+      { name: "O Pedrouzo", km: 89, lat: 42.9092, lng: -8.3612 },
+      { name: "Santiago de Compostela", km: 115, lat: 42.8805, lng: -8.5456 },
+    ],
+  },
+};
+
+const DEFAULT_SETTINGS = { p1Name: "Anita", p2Name: "Shawn", route: "hadrians-wall" };
+
+let settings = { ...DEFAULT_SETTINGS };
+let entries = [];
+
+function cacheLocally() {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify({ settings, entries })); } catch {}
+}
+function loadCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+function entriesObjToArray(obj) {
+  if (!obj) return [];
+  return Object.entries(obj)
+    .map(([date, v]) => ({ date, p1: Number(v.p1) || 0, p2: Number(v.p2) || 0 }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function setStatus(text, isError) {
+  const el = document.getElementById("sync-status");
+  if (!el) return;
+  el.textContent = text;
+  el.style.color = isError ? "#c0392b" : "#999";
+}
+
+async function fetchRemote() {
+  const res = await fetch(`${DB_URL}/.json`);
+  if (!res.ok) throw new Error("Firebase request failed: " + res.status);
+  return res.json();
+}
+
+async function loadAndRender({ silent } = {}) {
+  try {
+    const data = await fetchRemote();
+    settings = { ...DEFAULT_SETTINGS, ...(data && data.settings) };
+    entries = entriesObjToArray(data && data.entries);
+    cacheLocally();
+    setStatus(`Synced with shared database · last update ${new Date().toLocaleTimeString()}`);
+  } catch (err) {
+    if (!silent) {
+      const cached = loadCache();
+      if (cached) { settings = { ...DEFAULT_SETTINGS, ...cached.settings }; entries = cached.entries || []; }
+    }
+    setStatus("Couldn't reach the shared database — showing last saved data.", true);
+  }
+  render();
+}
+
+async function pushSettings(newSettings) {
+  settings = newSettings;
+  render();
+  try {
+    await fetch(`${DB_URL}/settings.json`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newSettings),
+    });
+    cacheLocally();
+    setStatus(`Synced with shared database · last update ${new Date().toLocaleTimeString()}`);
+  } catch {
+    setStatus("Saved on this device only — couldn't reach the shared database.", true);
+  }
+}
+
+async function pushEntry(date, p1, p2) {
+  entries = entries.filter((e) => e.date !== date);
+  entries.push({ date, p1, p2 });
+  entries.sort((a, b) => a.date.localeCompare(b.date));
+  render();
+  try {
+    await fetch(`${DB_URL}/entries/${date}.json`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ p1, p2 }),
+    });
+    cacheLocally();
+    setStatus(`Synced with shared database · last update ${new Date().toLocaleTimeString()}`);
+  } catch {
+    setStatus("Saved on this device only — couldn't reach the shared database.", true);
+  }
+}
+
+async function deleteEntry(date) {
+  entries = entries.filter((e) => e.date !== date);
+  render();
+  try {
+    await fetch(`${DB_URL}/entries/${date}.json`, { method: "DELETE" });
+    cacheLocally();
+    setStatus(`Synced with shared database · last update ${new Date().toLocaleTimeString()}`);
+  } catch {
+    setStatus("Saved on this device only — couldn't reach the shared database.", true);
+  }
+}
+
+function fmt(n) { return Math.round(n).toLocaleString(); }
+
+function winnerOf(entry) {
+  if (entry.p1 > entry.p2) return "p1";
+  if (entry.p2 > entry.p1) return "p2";
+  return "tie";
+}
+
+function statsFor(playerKey, entries) {
+  const total = entries.reduce((sum, e) => sum + e[playerKey], 0);
+  const avg = entries.length ? total / entries.length : 0;
+  const daysWon = entries.filter((e) => winnerOf(e) === playerKey).length;
+  let streak = 0;
+  for (let i = entries.length - 1; i >= 0; i--) {
+    const w = winnerOf(entries[i]);
+    if (w === playerKey) streak++;
+    else if (w === "tie") continue;
+    else break;
+  }
+  return { total, avg, daysWon, streak };
+}
+
+function render() {
+  const active = document.activeElement && document.activeElement.id;
+
+  if (active !== "p1-name") document.getElementById("p1-name").value = settings.p1Name;
+  if (active !== "p2-name") document.getElementById("p2-name").value = settings.p2Name;
+  const routeSelect = document.getElementById("route-select");
+  if (active !== "route-select") {
+    routeSelect.innerHTML = Object.entries(ROUTES)
+      .map(([key, r]) => `<option value="${key}" ${key === settings.route ? "selected" : ""}>${r.label}</option>`)
+      .join("");
+  }
+  document.getElementById("p1-steps-label").textContent = `${settings.p1Name} steps`;
+  document.getElementById("p2-steps-label").textContent = `${settings.p2Name} steps`;
+  if (!document.getElementById("log-date").value) {
+    document.getElementById("log-date").value = new Date().toISOString().slice(0, 10);
+  }
+
+  renderScoreboard(settings, entries);
+  renderRace(settings, entries);
+  renderMap(settings, entries);
+  renderCharts(settings, entries);
+  renderHistory(settings, entries);
+}
+
+let leafletMap = null;
+let routeLine = null;
+let waypointMarkersLayer = null;
+let playerMarkers = {};
+let lastMapRouteKey = null;
+
+function interpolateOnRoute(route, km) {
+  const wps = route.waypoints;
+  const clamped = Math.max(0, Math.min(route.totalKm, km));
+  for (let i = 0; i < wps.length - 1; i++) {
+    const a = wps[i], b = wps[i + 1];
+    if (clamped >= a.km && clamped <= b.km) {
+      const t = b.km === a.km ? 0 : (clamped - a.km) / (b.km - a.km);
+      return [a.lat + (b.lat - a.lat) * t, a.lng + (b.lng - a.lng) * t];
+    }
+  }
+  const last = wps[wps.length - 1];
+  return [last.lat, last.lng];
+}
+
+function renderMap(settings, entries) {
+  const mapEl = document.getElementById("route-map");
+  if (!mapEl || typeof L === "undefined") return;
+  if (!leafletMap) {
+    leafletMap = L.map("route-map", { scrollWheelZoom: false });
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18,
+      attribution: "&copy; OpenStreetMap contributors",
+    }).addTo(leafletMap);
+  }
+
+  const route = ROUTES[settings.route];
+
+  if (lastMapRouteKey !== settings.route) {
+    if (routeLine) leafletMap.removeLayer(routeLine);
+    if (waypointMarkersLayer) leafletMap.removeLayer(waypointMarkersLayer);
+    const latlngs = route.waypoints.map((w) => [w.lat, w.lng]);
+    routeLine = L.polyline(latlngs, { color: "#e0455f", weight: 3 }).addTo(leafletMap);
+    waypointMarkersLayer = L.layerGroup(
+      route.waypoints.map((w) =>
+        L.circleMarker([w.lat, w.lng], {
+          radius: 4, color: "#999", weight: 1, fillColor: "#fff", fillOpacity: 1,
+        }).bindTooltip(w.name)
+      )
+    ).addTo(leafletMap);
+    leafletMap.fitBounds(routeLine.getBounds(), { padding: [24, 24] });
+    lastMapRouteKey = settings.route;
+    setTimeout(() => leafletMap.invalidateSize(), 0);
+  }
+
+  const s1 = statsFor("p1", entries);
+  const s2 = statsFor("p2", entries);
+  const pos1 = interpolateOnRoute(route, s1.total / STEPS_PER_KM);
+  const pos2 = interpolateOnRoute(route, s2.total / STEPS_PER_KM);
+
+  const icon = (emoji) => L.divIcon({
+    className: "", html: `<div class="map-pin">${emoji}</div>`, iconSize: [26, 26], iconAnchor: [13, 13],
+  });
+
+  if (!playerMarkers.p1) {
+    playerMarkers.p1 = L.marker(pos1, { icon: icon("🐻") }).addTo(leafletMap);
+    playerMarkers.p2 = L.marker(pos2, { icon: icon("🐯") }).addTo(leafletMap);
+  } else {
+    playerMarkers.p1.setLatLng(pos1);
+    playerMarkers.p2.setLatLng(pos2);
+  }
+  playerMarkers.p1.bindTooltip(settings.p1Name);
+  playerMarkers.p2.bindTooltip(settings.p2Name);
+}
+
+function renderScoreboard(settings, entries) {
+  const el = document.getElementById("scoreboard");
+  if (!entries.length) {
+    el.innerHTML = `<p class="empty-state">No days logged yet — add one above to get started.</p>`;
+    return;
+  }
+  const s1 = statsFor("p1", entries);
+  const s2 = statsFor("p2", entries);
+  const ties = entries.filter((e) => winnerOf(e) === "tie").length;
+
+  const card = (name, s, cls) => `
+    <div class="score-card ${cls}">
+      <p class="score-name">${name}</p>
+      <div class="score-grid">
+        <div class="score-tile"><div class="val">${fmt(s.total)}</div><div class="lbl">Total steps</div></div>
+        <div class="score-tile"><div class="val">${fmt(s.avg)}</div><div class="lbl">Avg / day</div></div>
+        <div class="score-tile"><div class="val">${s.daysWon}</div><div class="lbl">Days won</div></div>
+        <div class="score-tile"><div class="val">${s.streak}</div><div class="lbl">Day streak</div></div>
+      </div>
+    </div>`;
+
+  el.innerHTML = `
+    <div class="scoreboard">
+      ${card(settings.p1Name, s1, "p1")}
+      ${card(settings.p2Name, s2, "p2")}
+    </div>
+    ${ties ? `<p class="tie-note">${ties} day${ties > 1 ? "s" : ""} tied</p>` : ""}
+  `;
+}
+
+function renderRace(settings, entries) {
+  const el = document.getElementById("race");
+  const route = ROUTES[settings.route];
+  if (!entries.length) {
+    el.innerHTML = `<p class="empty-state">Log some steps to see progress along the route.</p>`;
+    return;
+  }
+  const s1 = statsFor("p1", entries);
+  const s2 = statsFor("p2", entries);
+  const km1 = Math.min(route.totalKm, s1.total / STEPS_PER_KM);
+  const km2 = Math.min(route.totalKm, s2.total / STEPS_PER_KM);
+  const pct1 = (km1 / route.totalKm) * 100;
+  const pct2 = (km2 / route.totalKm) * 100;
+  const maxPct = Math.max(pct1, pct2);
+
+  const nearestWaypoint = (km) => {
+    let last = route.waypoints[0];
+    for (const w of route.waypoints) {
+      if (w.km <= km) last = w;
+    }
+    return last.name;
+  };
+
+  const close = Math.abs(pct1 - pct2) < 8;
+
+  el.innerHTML = `
+    <div class="track-wrap">
+      <div class="track">
+        <div class="track-fill" style="width:${maxPct}%"></div>
+        <div class="marker p1" style="left:${pct1}%">
+          <span class="pill"><span class="emoji">🐻</span></span>
+        </div>
+        <div class="marker p2 ${close ? "shift-up" : ""}" style="left:${pct2}%">
+          <span class="pill"><span class="emoji">🐯</span></span>
+        </div>
+        ${route.waypoints.map((w) => `
+          <div class="tick" style="left:${(w.km / route.totalKm) * 100}%"></div>
+          <div class="tick-label" style="left:${(w.km / route.totalKm) * 100}%">${w.name}</div>
+        `).join("")}
+      </div>
+    </div>
+    <div class="race-distances">
+      <span>${settings.p1Name}: ${km1.toFixed(1)} km — ${nearestWaypoint(km1)}</span>
+      <span>${settings.p2Name}: ${km2.toFixed(1)} km — ${nearestWaypoint(km2)}</span>
+    </div>
+  `;
+}
+
+function svgLineChart(entries, key1, key2, cumulative) {
+  const w = 420, h = 220, padL = 44, padR = 10, padT = 10, padB = 26;
+  const dates = entries.map((e) => e.date);
+  const seriesFor = (key) => {
+    let running = 0;
+    return entries.map((e) => {
+      running += e[key];
+      return cumulative ? running : e[key];
+    });
+  };
+  const v1 = seriesFor(key1);
+  const v2 = seriesFor(key2);
+  const maxVal = Math.max(1, ...v1, ...v2);
+  const niceMax = Math.ceil(maxVal / 5) * 5 || 5;
+  const n = entries.length;
+  const x = (i) => padL + (n <= 1 ? 0 : (i / (n - 1)) * (w - padL - padR));
+  const y = (v) => padT + (1 - v / niceMax) * (h - padT - padB);
+
+  const path = (vals) => vals.map((v, i) => `${i === 0 ? "M" : "L"} ${x(i)} ${y(v)}`).join(" ");
+
+  const gridLines = [0, 0.25, 0.5, 0.75, 1].map((f) => {
+    const val = niceMax * f;
+    const yy = y(val);
+    return `<line x1="${padL}" y1="${yy}" x2="${w - padR}" y2="${yy}" stroke="#eee" stroke-width="1" />
+            <text x="${padL - 8}" y="${yy + 3}" font-size="9" fill="#999" text-anchor="end">${fmt(val)}</text>`;
+  }).join("");
+
+  const xLabels = dates.map((d, i) => {
+    if (n > 6 && i % Math.ceil(n / 6) !== 0 && i !== n - 1) return "";
+    return `<text x="${x(i)}" y="${h - 6}" font-size="9" fill="#999" text-anchor="middle">${d.slice(5)}</text>`;
+  }).join("");
+
+  const dots = (vals, color) => vals.map((v, i) =>
+    `<circle cx="${x(i)}" cy="${y(v)}" r="2.5" fill="${color}" />`).join("");
+
+  return `
+    <svg viewBox="0 0 ${w} ${h}" style="width:100%; height:auto;">
+      ${gridLines}
+      ${xLabels}
+      <path d="${path(v1)}" fill="none" stroke="#0f9d78" stroke-width="2" />
+      <path d="${path(v2)}" fill="none" stroke="#4c4fd1" stroke-width="2" />
+      ${dots(v1, "#0f9d78")}
+      ${dots(v2, "#4c4fd1")}
+    </svg>
+  `;
+}
+
+function renderCharts(settings, entries) {
+  const el = document.getElementById("charts");
+  if (entries.length < 2) {
+    el.innerHTML = `<p class="empty-state">Log at least two days to see charts.</p>`;
+    return;
+  }
+  const legend = `
+    <div class="legend">
+      <span><i class="p1"></i>${settings.p1Name}</span>
+      <span><i class="p2"></i>${settings.p2Name}</span>
+    </div>`;
+  el.innerHTML = `
+    <div class="charts">
+      <div class="chart-box">
+        <p class="chart-title">Daily steps</p>
+        ${legend}
+        ${svgLineChart(entries, "p1", "p2", false)}
+      </div>
+      <div class="chart-box">
+        <p class="chart-title">Cumulative steps</p>
+        ${legend}
+        ${svgLineChart(entries, "p1", "p2", true)}
+      </div>
+    </div>
+  `;
+}
+
+function renderHistory(settings, entries) {
+  const el = document.getElementById("history");
+  if (!entries.length) {
+    el.innerHTML = `<p class="empty-state">No entries yet.</p>`;
+    return;
+  }
+  const rows = [...entries].reverse().map((e) => {
+    const w = winnerOf(e);
+    const badge = w === "tie"
+      ? `<span class="badge tie">Tie</span>`
+      : `<span class="badge ${w}">${w === "p1" ? settings.p1Name : settings.p2Name}</span>`;
+    return `
+      <tr>
+        <td>${e.date}</td>
+        <td>${fmt(e.p1)}</td>
+        <td>${fmt(e.p2)}</td>
+        <td>${badge}</td>
+        <td><button class="del-btn" data-date="${e.date}">Delete</button></td>
+      </tr>`;
+  }).join("");
+
+  el.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>${settings.p1Name}</th>
+          <th>${settings.p2Name}</th>
+          <th>Winner</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+
+  el.querySelectorAll(".del-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      deleteEntry(btn.dataset.date);
+    });
+  });
+}
+
+document.getElementById("setup-form").addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  pushSettings({
+    p1Name: document.getElementById("p1-name").value.trim() || "Player 1",
+    p2Name: document.getElementById("p2-name").value.trim() || "Player 2",
+    route: document.getElementById("route-select").value,
+  });
+});
+
+document.getElementById("log-form").addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  const date = document.getElementById("log-date").value;
+  const p1 = Number(document.getElementById("p1-steps").value);
+  const p2 = Number(document.getElementById("p2-steps").value);
+  if (!date || Number.isNaN(p1) || Number.isNaN(p2)) return;
+  pushEntry(date, p1, p2);
+  document.getElementById("p1-steps").value = "";
+  document.getElementById("p2-steps").value = "";
+});
+
+render();
+setStatus("Connecting to shared database…");
+loadAndRender();
+setInterval(() => loadAndRender({ silent: true }), 15000);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") loadAndRender({ silent: true });
+});
+</script>
+</body>
+</html>
