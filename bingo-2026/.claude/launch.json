@@ -3,9 +3,8 @@
   "configurations": [
     {
       "name": "bingo-2026",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "4173"],
-      "port": 4173
+      "url": "http://localhost:4173",
+      "autoPort": false
     }
   ]
 }
