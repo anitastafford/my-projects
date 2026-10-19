@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"/Users/anita/Library/Mobile Documents/com~apple~CloudDocs/** PROJECTS 🟣/Github Projects/bingo-2026/updates/post-commit-check.py\""
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/updates/post-commit-check.py\""
           }
         ]
       }
