@@ -3,7 +3,9 @@
   "configurations": [
     {
       "name": "bingo-2026",
-      "url": "http://localhost:4173",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd \"$HOME/.cache/bingo-2026-preview\" && exec python3 -m http.server 4173"],
+      "port": 4173,
       "autoPort": false
     }
   ]
