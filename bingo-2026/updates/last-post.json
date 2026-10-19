@@ -1,6 +1,6 @@
 {
-  "week": 32,
-  "date": "2026-08-09",
+  "week": 36,
+  "date": "2026-09-06",
   "state": {
     "0": [
       "mila",
@@ -79,13 +79,17 @@
     "13": [
       "maya",
       "anita",
-      "shawn"
+      "shawn",
+      "mila",
+      "marie"
     ],
     "14": [
       "mila",
       "marie",
       "maya",
-      "anita"
+      "anita",
+      "shawn",
+      "max"
     ],
     "15": [
       "marie",
@@ -113,7 +117,8 @@
     "19": [
       "marie",
       "maya",
-      "mila"
+      "mila",
+      "anita"
     ],
     "21": [
       "mila",
@@ -130,7 +135,9 @@
       "anita"
     ],
     "24": [
-      "anita"
+      "anita",
+      "marie",
+      "max"
     ],
     "25": [
       "marie"
@@ -151,7 +158,8 @@
       "marie",
       "anita",
       "mila",
-      "shawn"
+      "shawn",
+      "maya"
     ],
     "29": [
       "marie",
@@ -161,7 +169,9 @@
     "30": [
       "anita",
       "shawn",
-      "marie"
+      "marie",
+      "maya",
+      "mila"
     ],
     "32": [
       "marie",

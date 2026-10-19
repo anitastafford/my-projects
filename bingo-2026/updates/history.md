@@ -33,3 +33,36 @@ https://anitastafford.github.io/my-projects/bingo-2026/
 ```
 
 ---
+
+## Week 36 — 2026-09-06
+
+```
+WEEK 36 BINGO UPDATE!
+
+36 weeks down, 16 to go! We wrung the last drops out of summer - ocean swims, a few new games, and some good deeds for the animals. The board's filling up fast. Keep those photos coming, Bingo besties! 🍂
+https://anitastafford.github.io/my-projects/bingo-2026/
+
+💚 Marié (43/49)
+-- Swim in the ocean ⭐
+-- Help out a homeless animal ⭐
+
+🩷 Maya (35/49)
+-- Support a small business ⭐
+-- Watch a Marie recommended movie ⭐
+
+💜 Anita (31/49)
+-- Learn and share a poem ⭐
+
+🩵 Shawn (18/49)
+-- Play a new game ⭐
+
+💗 Mila (28/49)
+-- Swim in the ocean ⭐
+-- Watch a Marie recommended movie ⭐
+
+💛 Max (12/49)
+-- Play a new game ⭐
+-- Help out a homeless animal ⭐
+```
+
+---
