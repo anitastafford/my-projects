@@ -1,6 +1,6 @@
 {
-  "week": 36,
-  "date": "2026-09-06",
+  "week": 42,
+  "date": "2026-10-18",
   "state": {
     "0": [
       "mila",
@@ -16,14 +16,17 @@
     "2": [
       "mila",
       "marie",
-      "maya"
+      "maya",
+      "anita",
+      "shawn"
     ],
     "3": [
       "marie",
       "maya",
       "anita",
       "max",
-      "mila"
+      "mila",
+      "shawn"
     ],
     "4": [
       "marie",
@@ -46,7 +49,8 @@
     "7": [
       "mila",
       "marie",
-      "shawn"
+      "shawn",
+      "maya"
     ],
     "8": [
       "marie",
@@ -56,7 +60,9 @@
     "9": [
       "marie",
       "maya",
-      "mila"
+      "mila",
+      "anita",
+      "shawn"
     ],
     "10": [
       "marie",
@@ -68,7 +74,8 @@
       "anita",
       "mila",
       "max",
-      "marie"
+      "marie",
+      "shawn"
     ],
     "12": [
       "marie",
@@ -107,7 +114,8 @@
     "17": [
       "marie",
       "maya",
-      "anita"
+      "anita",
+      "shawn"
     ],
     "18": [
       "marie",
@@ -119,6 +127,11 @@
       "maya",
       "mila",
       "anita"
+    ],
+    "20": [
+      "anita",
+      "shawn",
+      "marie"
     ],
     "21": [
       "mila",
@@ -132,7 +145,8 @@
     "23": [
       "marie",
       "maya",
-      "anita"
+      "anita",
+      "shawn"
     ],
     "24": [
       "anita",
@@ -145,7 +159,8 @@
     "26": [
       "marie",
       "anita",
-      "shawn"
+      "shawn",
+      "mila"
     ],
     "27": [
       "marie",
@@ -164,7 +179,9 @@
     "29": [
       "marie",
       "maya",
-      "mila"
+      "mila",
+      "anita",
+      "shawn"
     ],
     "30": [
       "anita",
@@ -182,7 +199,8 @@
     ],
     "33": [
       "marie",
-      "anita"
+      "anita",
+      "shawn"
     ],
     "34": [
       "marie",
@@ -198,6 +216,10 @@
       "shawn",
       "mila"
     ],
+    "36": [
+      "anita",
+      "shawn"
+    ],
     "37": [
       "marie",
       "maya",
@@ -210,7 +232,8 @@
     "39": [
       "marie",
       "maya",
-      "anita"
+      "anita",
+      "shawn"
     ],
     "40": [
       "marie",
@@ -222,13 +245,16 @@
     "41": [
       "marie",
       "maya",
-      "mila"
+      "mila",
+      "anita",
+      "shawn"
     ],
     "42": [
       "marie",
       "maya",
       "anita",
-      "mila"
+      "mila",
+      "shawn"
     ],
     "44": [
       "marie",

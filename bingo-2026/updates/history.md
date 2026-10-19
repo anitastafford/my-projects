@@ -66,3 +66,48 @@ https://anitastafford.github.io/my-projects/bingo-2026/
 ```
 
 ---
+
+## Week 42 — 2026-10-18
+
+```
+WEEK 42 BINGO UPDATE!
+
+42 weeks down, only 10 to go! 🎃 Pumpkin season is here and the squares are falling like autumn leaves. Huge shoutout to Shawn for a massive 13-square haul! 🍂 Keep it up Bingo besties!
+https://anitastafford.github.io/my-projects/bingo-2026/
+
+💚 Marié (44/49)
+-- Celebrate Pumpkin season ⭐
+
+🩷 Maya (36/49)
+-- Help a stranger ⭐
+
+💜 Anita (37/49)
+-- Visit a museum or gallery ⭐
+-- Celebrate a historical day ⭐
+-- Celebrate Pumpkin season ⭐
+-- Help out a cat or visit a cat cafe ⭐
+-- Capture autumnal neighbourhood colours ⭐
+-- Make a positive environmental impact ⭐
+
+🩵 Shawn (31/49)
+-- Visit a museum or gallery ⭐
+-- Try a new culture-specific food ⭐
+-- Celebrate a historical day ⭐
+-- Learn a new skill ⭐
+-- Be on a boat ⭐
+-- Celebrate Pumpkin season ⭐
+-- Re-watch a favourite movie ⭐
+-- Help out a cat or visit a cat cafe ⭐
+-- Experience blue ⭐
+-- Capture autumnal neighbourhood colours ⭐
+-- Listen to a Max-recommended song ⭐
+-- Make a positive environmental impact ⭐
+-- Travel somewhere new ⭐
+
+💗 Mila (29/49)
+-- Go on a roadtrip ⭐
+
+💛 Max (12/49)
+```
+
+---
